@@ -1,5 +1,8 @@
 import os
 
+# Membersihkan terminal
+os.system('cls' if os.name == 'nt' else 'clear')
+
 # Daftar jalur folder yang ingin dibuat
 folders = [
     os.path.join(os.path.dirname(__file__), 'sessions', 'gramjs_string'),
