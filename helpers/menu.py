@@ -12,7 +12,7 @@ def main_menu():
 
     while True:
         if config.get("api_id") is None or config.get("api_hash") == "":
-            print("Peringatan: 'api_id' dan 'api_hash' belum diatur. Silakan isi keduanya di pengaturan API.")
+            print("\nPeringatan: 'api_id' dan 'api_hash' belum diatur. Silakan isi keduanya di pengaturan API.")
 
         print("""
         Menu Utama:
