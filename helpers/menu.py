@@ -10,10 +10,10 @@ def main_menu():
     file_config = os.path.join(os.path.dirname(__file__), '..', 'config', 'config.json')
     config = data.baca(file_config)
 
-    if config.get("api_id") is None or config.get("api_hash") == "":
-        print("Peringatan: 'api_id' dan 'api_hash' belum diatur. Silakan isi keduanya di pengaturan API.")
-
     while True:
+        if config.get("api_id") is None or config.get("api_hash") == "":
+            print("Peringatan: 'api_id' dan 'api_hash' belum diatur. Silakan isi keduanya di pengaturan API.")
+
         print("""
         Menu Utama:
         1. Auto Login
