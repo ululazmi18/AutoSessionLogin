@@ -2,6 +2,7 @@
 # Menampilkan menu utama dan menangani pilihan pengguna
 def main_menu():
     import sys
+    import os
     import asyncio
     from core import periksa, auto_login
     from helpers import data
