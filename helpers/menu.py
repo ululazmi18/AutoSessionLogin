@@ -25,11 +25,19 @@ def main_menu():
         pilihan = input("Pilih: ")
         
         if pilihan == "1":
-            asyncio.run(periksa.periksa_folder_lupa())
-            asyncio.run(auto_login.autologin())
-            asyncio.run(periksa.periksa_sesi())
+            if config.get("api_id") is None or config.get("api_hash") == "":
+                pass
+            else:
+                asyncio.run(asyncio.gather(
+                    periksa.periksa_folder_lupa(),
+                    auto_login.autologin(),
+                    periksa.periksa_sesi()
+                ))
         elif pilihan == "2":
-            sesi_baru()
+            if config.get("api_id") is None or config.get("api_hash") == "":
+                pass
+            else:
+                sesi_baru()
         elif pilihan == "3":
             menu_pengaturan()
         elif pilihan == "4":
