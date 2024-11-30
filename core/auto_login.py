@@ -1,14 +1,8 @@
 import os
 import sys
-import shutil
-import subprocess
 
 # Menambahkan jalur folder utama ke sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# Import modul dari direktori core dan helpers
-from core import periksa, sesi_pyrogram, sesi_telethon
-from helpers import data, pengaturan
 
 folder_telethon = os.path.join(os.path.dirname(__file__), '..', 'sessions', 'telethon')
 folder_pyrogram = os.path.join(os.path.dirname(__file__), '..', 'sessions', 'pyrogram')
@@ -31,6 +25,8 @@ file_data = os.path.join(os.path.dirname(__file__), '..', 'config', 'data.json')
 
 # Fungsi untuk migrasi dari Pyrogram ke Telethon
 async def dari_pyrogram(data_pyrogram):
+    from helpers import pengaturan
+    from core import sesi_pyrogram, sesi_telethon
     for nama_file in data_pyrogram:
         print("\nMigrasi dari Pyrogram ke Telethon")
         pengaturan.ruang_kerja()
@@ -49,6 +45,9 @@ async def dari_pyrogram(data_pyrogram):
 
 # Fungsi untuk migrasi dari sesi GramJS String ke Pyrogram
 async def dari_gramjs_string(data_gramjs_string):
+    from helpers import data, pengaturan
+    import subprocess
+    from core import sesi_pyrogram
     for nama_file in data_gramjs_string:
         print("\nMigrasi dari GramJS String ke Pyrogram")
         pengaturan.ruang_kerja()
@@ -64,10 +63,12 @@ async def dari_gramjs_string(data_gramjs_string):
 
         datasesi = data.baca(file_data)
         nomor = datasesi["Nomor"]
-        await sesi_pyrogram.daftar_pyrogram_dari_gramjs_string(nama_file, nomor, folder_pyrogram)
+        folder_uji = pengaturan.folder_uji(nama_file)
+        await sesi_pyrogram.daftar_pyrogram_dari_gramjs_string(nama_file, nomor, folder_uji)
 
 # Fungsi utama untuk menjalankan proses Auto Login
 async def autologin():
+    from core import periksa
     print("Menjalankan Auto Login...")
 
     dataselisih = periksa.periksa_perbedaan_sessions()

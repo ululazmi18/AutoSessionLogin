@@ -42,27 +42,35 @@ async function main() {
 
         // Mendapatkan informasi akun
         const me = await client.getMe();
+
+        if (!me) {
+            throw new Error("Gagal mendapatkan informasi akun. Pastikan sesi valid.");
+        }
+
         const nama = me.lastName ? `${me.firstName} ${me.lastName}` : me.firstName;
+
+        // Validasi jika `me.phone` tidak ada
+        const nomor = me.phone || "Nomor tidak tersedia";
 
         // Memperbarui data kode
         const kodePath = path.join(__dirname, "..", "..", "config", "kode.json");
         const kode = JSON.parse(fs.readFileSync(kodePath, "utf-8"));
 
-        if (!kode[me.phone]) {
-            kode[me.phone] = "";
+        if (!kode[nomor]) {
+            kode[nomor] = "";
             fs.writeFileSync(kodePath, JSON.stringify(kode, null, 4), "utf-8");
         }
 
         data.nama = nama;
-        data.Nomor = me.phone;
+        data.Nomor = nomor;
 
         fs.writeFileSync(dataPath, JSON.stringify(data, null, 4), "utf-8");
 
-        console.log(`Menggunakan ${nama} | ${me.phone}`);
+        console.log(`Menggunakan ${nama} | ${nomor}`);
         console.log("Terhubung ke gramjs_string");
 
     } catch (err) {
-        console.error(`Terjadi kesalahan: ${err.message}`);
+        console.error(`Terjadi kesalahan di masuk_gramjs_string: ${err.message}`);
     } finally {
         // Menutup koneksi client
         await client.disconnect();
@@ -71,4 +79,4 @@ async function main() {
 }
 
 // Menjalankan fungsi utama
-main().catch(logger2.error);
+main();

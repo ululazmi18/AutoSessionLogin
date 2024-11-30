@@ -1,28 +1,23 @@
 import os
 import sys
-import re
-import asyncio
-from telethon import TelegramClient
-from telethon.errors import SessionPasswordNeededError, UnauthorizedError
-from datetime import datetime, timedelta
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from helpers import data, pengaturan
-from core import sesi_pyrogram
-
-# File paths
-file_kode = os.path.join(os.path.dirname(__file__), '..', 'config', 'kode.json')
-file_config = os.path.join(os.path.dirname(__file__), '..', 'config', 'config.json')
-
-# Load configuration
-config = data.baca(file_config)
-api_id = config["api_id"]
-api_hash = config["api_hash"]
-
-client = None
 
 # Fungsi untuk memulai client Telethon dan mendapatkan nomor telepon
 async def masuk_telethon(jalur_file):
+    from telethon import TelegramClient
+    from helpers import data
+
+    # File paths
+    file_kode = os.path.join(os.path.dirname(__file__), '..', 'config', 'kode.json')
+    file_config = os.path.join(os.path.dirname(__file__), '..', 'config', 'config.json')
+
+    # Load configuration
+    config = data.baca(file_config)
+    api_id = config["api_id"]
+    api_hash = config["api_hash"]
+
     global client
+    
     client = TelegramClient(
         jalur_file.replace(".session", ""),
         api_id=api_id,
@@ -43,6 +38,20 @@ async def masuk_telethon(jalur_file):
 
 # Fungsi untuk mendaftar akun ke Telethon
 async def daftar_telethon(jalur_file, nomor, nama, nama_file):
+    from telethon import TelegramClient
+    from telethon.errors import SessionPasswordNeededError, UnauthorizedError
+    from helpers import data, pengaturan
+    from core import sesi_pyrogram
+
+    # File paths
+    file_kode = os.path.join(os.path.dirname(__file__), '..', 'config', 'kode.json')
+    file_config = os.path.join(os.path.dirname(__file__), '..', 'config', 'config.json')
+
+    # Load configuration
+    config = data.baca(file_config)
+    api_id = config["api_id"]
+    api_hash = config["api_hash"]
+
     try:
         print(f"Daftar ke Telethon dengan {nama} | {nomor}")
         client = TelegramClient(
@@ -120,7 +129,13 @@ async def daftar_telethon(jalur_file, nomor, nama, nama_file):
 
 # Fungsi untuk mengambil kode otentikasi dari pesan terakhir di Telethon
 async def kode_telethon():
+    import re
+    import asyncio
+    from datetime import datetime, timedelta
+    from helpers import data
+    
     global client
+    
     while True:
         messages = await client.get_messages(777000, limit=1)
         if messages:
@@ -140,8 +155,3 @@ async def kode_telethon():
                     return kode
 
         await asyncio.sleep(1)  # Retry setiap detik jika kode tidak ditemukan
-
-# Fungsi untuk keluar dari klien Telethon
-async def keluar_telethon():
-    global client
-    await client.disconnect()

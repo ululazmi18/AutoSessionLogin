@@ -1,7 +1,10 @@
 {
   "dependencies": {
+    "core-js": "^3.39.0",
+    "input": "^1.0.1",
     "moment": "^2.30.1",
     "ps-node": "^0.1.6",
-    "telegram": "^2.26.6"
+    "qrcode-terminal": "^0.12.0",
+    "telegram": "^2.26.8"
   }
 }

@@ -1,33 +1,25 @@
 import os
 import sys
-import re
-import asyncio
-import subprocess
-from pyrogram import Client
-from pyrogram.errors import (
-    SessionPasswordNeeded, FloodWait, PhoneCodeInvalid, 
-    PhoneNumberInvalid, BadRequest, Unauthorized, RPCError
-)
-
 # Tambahkan path untuk mengakses modul dari direktori lain
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from helpers import data
-from core import sesi_telethon
-
-# Definisi path ke folder dan file yang digunakan
-folder_pyrogram = os.path.join(os.path.dirname(__file__), '..', 'sessions', 'pyrogram')
-file_kode = os.path.join(os.path.dirname(__file__), '..', 'config', 'kode.json')
-file_data = os.path.join(os.path.dirname(__file__), '..', 'config', 'data.json')
-file_config = os.path.join(os.path.dirname(__file__), '..', 'config', 'config.json')
-
-# Baca konfigurasi API dari file
-config = data.baca(file_config)
-api_id = config["api_id"]
-api_hash = config["api_hash"]
-
 # Fungsi untuk masuk menggunakan sesi Pyrogram
 async def masuk_pyrogram(nama, workdir):
+    import gc
+    from pyrogram import Client
+    from helpers import data
+
+    # Definisi path ke folder dan file yang digunakan
+    folder_pyrogram = os.path.join(os.path.dirname(__file__), '..', 'sessions', 'pyrogram')
+    file_kode = os.path.join(os.path.dirname(__file__), '..', 'config', 'kode.json')
+    file_config = os.path.join(os.path.dirname(__file__), '..', 'config', 'config.json')
+
+    # Baca konfigurasi API dari file
+    config = data.baca(file_config)
+    api_id = config["api_id"]
+    api_hash = config["api_hash"]
+
+    
     app = None  # Inisialisasi klien Pyrogram
     try:
         app = Client(
@@ -75,10 +67,30 @@ async def masuk_pyrogram(nama, workdir):
 
     print("Terhubung ke Pyrogram")
     print(f"{nomor_telepon} {nama_pengguna}")
+    # Bebaskan semua sumber daya yang terkait dengan Pyrogram
+    del app
+    gc.collect()  # Memastikan tidak ada referensi residual
     return nomor_telepon, nama_pengguna
 
 # Fungsi untuk mendaftar sesi Pyrogram menggunakan nomor telepon
 async def daftar_pyrogram(name, phone_number, workdir):
+    import asyncio
+    import gc
+    from pyrogram import Client
+    from pyrogram.errors import SessionPasswordNeeded, Unauthorized
+    from helpers import data
+    from core import sesi_telethon
+
+    # Definisi path ke folder dan file yang digunakan
+    file_kode = os.path.join(os.path.dirname(__file__), '..', 'config', 'kode.json')
+    file_config = os.path.join(os.path.dirname(__file__), '..', 'config', 'config.json')
+
+    # Baca konfigurasi API dari file
+    config = data.baca(file_config)
+    api_id = config["api_id"]
+    api_hash = config["api_hash"]
+
+    
     app = Client(
         name=name.replace(".session", ""),
         phone_number=phone_number,
@@ -111,12 +123,35 @@ async def daftar_pyrogram(name, phone_number, workdir):
                 if attempt == max_attempts - 1:
                     print("Gagal login setelah beberapa percobaan.")
                     raise
+    
     finally:
-        await app.stop()
+        # Pastikan sesi dihentikan
+        if app.is_connected:
+            await app.stop()
+            
+    # Bebaskan semua sumber daya yang terkait dengan Pyrogram
+    del app
+    gc.collect()  # Memastikan tidak ada referensi residual
+        
     print("Sesi berhasil dibuat!")
-
+    
 # Fungsi untuk menangkap kode Pyrogram dari chat Telegram
 async def kode_pyrogram(nama, workdir):
+    import re
+    import gc
+    import asyncio
+
+    from helpers import data
+    from pyrogram import Client
+
+    # Definisi path ke folder dan file yang digunakan
+    file_config = os.path.join(os.path.dirname(__file__), '..', 'config', 'config.json')
+
+    # Baca konfigurasi API dari file
+    config = data.baca(file_config)
+    api_id = config["api_id"]
+    api_hash = config["api_hash"]
+
     app = Client(
         name=nama.replace(".session", ""),
         api_id=api_id,
@@ -134,14 +169,43 @@ async def kode_pyrogram(nama, workdir):
                     kode = match.group(1)
                     print(f"Kode yang diterima: {kode}")
                     await app.stop()
+                    # Bebaskan semua sumber daya yang terkait dengan Pyrogram
+                    del app
+                    gc.collect()  # Memastikan tidak ada referensi residual
+
                     return kode
             await asyncio.sleep(1)
         except Exception as e:
             print(f"Kesalahan saat mengambil kode: {e}")
             await asyncio.sleep(1)
-
+            
 
 async def daftar_pyrogram_dari_gramjs_string(name, phone_number, workdir):
+    import gc
+    import shutil
+    import asyncio
+    import subprocess
+    from helpers import data, pengaturan
+    from pyrogram import Client
+    from pyrogram.errors import (
+        SessionPasswordNeeded, FloodWait, PhoneCodeInvalid, 
+        PhoneNumberInvalid, BadRequest, Unauthorized, RPCError
+    )
+
+    # Definisi path ke folder dan file yang digunakan
+    file_kode = os.path.join(os.path.dirname(__file__), '..', 'config', 'kode.json')
+    file_data = os.path.join(os.path.dirname(__file__), '..', 'config', 'data.json')
+    file_config = os.path.join(os.path.dirname(__file__), '..', 'config', 'config.json')
+    
+    folder_pyrogram = os.path.join(os.path.dirname(__file__), '..', 'sessions', 'pyrogram')
+    jalur_simpan = os.path.join(folder_pyrogram, name)
+    jalur_hasil = os.path.join(workdir, name)
+
+    # Baca konfigurasi API dari file
+    config = data.baca(file_config)
+    api_id = config["api_id"]
+    api_hash = config["api_hash"]
+    
     app = Client(
         name=name.replace(".session", ""),
         phone_number=phone_number,
@@ -175,6 +239,12 @@ async def daftar_pyrogram_dari_gramjs_string(name, phone_number, workdir):
 
         # Menjalankan skrip Node.js untuk mendapatkan kode
         try:
+            folder_gramjs_string = os.path.join(os.path.dirname(__file__), '..', 'sessions', 'gramjs_string')
+            jalur_file = os.path.join(folder_gramjs_string, name)
+            jalur_lab = pengaturan.salin_file(jalur_file)
+            datasesi = data.baca(file_data)
+            datasesi.update({"folder_uji": jalur_lab})
+            data.simpan(file_data, datasesi)
             kode_gramjs_string = os.path.join("core", "js", "kode_gramjs_string.js")
             subprocess.run(["node", kode_gramjs_string], check=True)
         except subprocess.CalledProcessError as e:
@@ -198,7 +268,9 @@ async def daftar_pyrogram_dari_gramjs_string(name, phone_number, workdir):
         # Melakukan login dengan kode dan phone_code_hash
         try:
             await app.sign_in(phone_number=phone_number, phone_code=kode, phone_code_hash=phone_code_hash)
-                
+            
+            shutil.copy2(jalur_hasil, jalur_simpan)
+
         except SessionPasswordNeeded:
             # Baca data password yang disimpan
             kode = data.baca(file_kode)
@@ -221,6 +293,8 @@ async def daftar_pyrogram_dari_gramjs_string(name, phone_number, workdir):
                     # Simpan password hanya jika login berhasil
                     kode[phone_number] = password
                     data.simpan(file_kode, kode)
+                    
+                    shutil.copy2(jalur_hasil, jalur_simpan)
 
                     break  # Keluar dari loop jika login berhasil
 
@@ -252,9 +326,14 @@ async def daftar_pyrogram_dari_gramjs_string(name, phone_number, workdir):
         try:
                 await app.stop()
         except ConnectionError:
-            print("Klien sudah dihentikan.")
+            pass
         except Exception as e:
             print(f"Kesalahan saat menghentikan klien: {e}")
+            
+    
+    # Bebaskan semua sumber daya yang terkait dengan Pyrogram
+    del app
+    gc.collect()  # Memastikan tidak ada referensi residual
 
     print("Sesi berhasil dibuat!")
     

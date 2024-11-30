@@ -1,6 +1,5 @@
-from helpers import menu
-
 def main():
+    from helpers import menu
     # Memanggil fungsi menu utama
     menu.main_menu()
 

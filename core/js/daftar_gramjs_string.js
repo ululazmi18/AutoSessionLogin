@@ -13,8 +13,8 @@ const kodePath = path.join(__dirname, "..", "..", "config", "kode.json");
 
 // Membaca konfigurasi
 const { api_id, api_hash } = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-const data = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
 const kode = JSON.parse(fs.readFileSync(kodePath, "utf-8"));
+const data = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
 const jalurUji = data.folder_uji;
 const Nomor = data.Nomor;
 
@@ -93,7 +93,7 @@ async function main() {
         await fs.promises.writeFile(sessionFile, sessionString, "utf8");
         console.log(`Sesi berhasil disimpan untuk pengguna: ${me.phone}`);
     } catch (err) {
-        console.error(`Terjadi kesalahan: ${err.message}`);
+        console.error(`Terjadi kesalahan di daftar_gramjs_string: ${err.message}`);
     } finally {
         try {
             await client.disconnect();
