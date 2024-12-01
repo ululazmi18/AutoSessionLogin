@@ -31,11 +31,9 @@ def main_menu():
         pilihan = input("Pilih: ")
         
         if pilihan == "1":
-            asyncio.run(asyncio.gather(
-                periksa.periksa_folder_lupa(),
-                auto_login.autologin(),
-                periksa.periksa_sesi()
-            ))
+            asyncio.run(periksa.periksa_folder_lupa())
+            asyncio.run(auto_login.autologin())
+            asyncio.run(periksa.periksa_sesi())
         elif pilihan == "2":
             sesi_baru()
         elif pilihan == "3":
@@ -61,6 +59,7 @@ def menu_pengaturan():
         
         if pilihan == "1":
             pengaturan.api()
+            break
         elif pilihan == "2":
             break
         else:
