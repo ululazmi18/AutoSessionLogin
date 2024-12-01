@@ -282,9 +282,6 @@ async def periksa_sesi():
     if selesai:
         for nama_file in selesai:
             selesai_simpan(nama_file)
-            
-    sys.exit(1)
-
 
 # Periksa perbedaan sesi antar folder
 def periksa_perbedaan_sessions():
