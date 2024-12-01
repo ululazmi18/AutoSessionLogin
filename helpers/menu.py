@@ -1,19 +1,25 @@
 
-# Menampilkan menu utama dan menangani pilihan pengguna
-def main_menu():
-    import sys
+def periksaapi():
     import os
-    import asyncio
-    from core import periksa, auto_login
     from helpers import data
     
     file_config = os.path.join(os.path.dirname(__file__), '..', 'config', 'config.json')
     config = data.baca(file_config)
 
-    while True:
-        if config.get("api_id") is None or config.get("api_hash") == "":
-            print("\n\033[91mPeringatan: 'api_id' dan 'api_hash' belum diatur. Silakan isi keduanya di pengaturan API.")
+    if config.get("api_id") is None or config.get("api_hash") == "":
+        print("\n\033[91mPeringatan: 'api_id' dan 'api_hash' belum diatur. Silakan isi keduanya di pengaturan API.\033[0m")
 
+
+# Menampilkan menu utama dan menangani pilihan pengguna
+def main_menu():
+    import sys
+    import asyncio
+    from core import periksa, auto_login
+    
+    while True:
+        
+        periksaapi()
+    
         print("""
         Menu Utama:
         1. Auto Login
@@ -21,27 +27,17 @@ def main_menu():
         3. Pengaturan
         4. Keluar
         """)
-        
-        if config.get("api_id") is None or config.get("api_hash") == "":
-            print("\033[0m")
-
 
         pilihan = input("Pilih: ")
         
         if pilihan == "1":
-            if config.get("api_id") is None or config.get("api_hash") == "":
-                pass
-            else:
-                asyncio.run(asyncio.gather(
-                    periksa.periksa_folder_lupa(),
-                    auto_login.autologin(),
-                    periksa.periksa_sesi()
-                ))
+            asyncio.run(asyncio.gather(
+                periksa.periksa_folder_lupa(),
+                auto_login.autologin(),
+                periksa.periksa_sesi()
+            ))
         elif pilihan == "2":
-            if config.get("api_id") is None or config.get("api_hash") == "":
-                pass
-            else:
-                sesi_baru()
+            sesi_baru()
         elif pilihan == "3":
             menu_pengaturan()
         elif pilihan == "4":
